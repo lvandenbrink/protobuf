@@ -1,6 +1,6 @@
-# github.com/davecgh/go-spew v1.1.1
+# github.com/davecgh/go-spew v1.1.0
 github.com/davecgh/go-spew/spew
-# github.com/gogo/protobuf v0.0.0-20160617091352-2752d97bbd91
+# github.com/gogo/protobuf v1.2.1
 github.com/gogo/protobuf/gogoproto
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/protoc-gen-gogo/descriptor
@@ -9,6 +9,8 @@ github.com/gogo/protobuf/plugin/testgen
 github.com/gogo/protobuf/protoc-gen-gogo/generator
 github.com/gogo/protobuf/vanity
 github.com/gogo/protobuf/vanity/command
+github.com/gogo/protobuf/types
+github.com/gogo/protobuf/protoc-gen-gogo/generator/internal/remap
 github.com/gogo/protobuf/protoc-gen-gogo/plugin
 github.com/gogo/protobuf/plugin/compare
 github.com/gogo/protobuf/plugin/defaultcheck
@@ -18,7 +20,6 @@ github.com/gogo/protobuf/plugin/enumstringer
 github.com/gogo/protobuf/plugin/equal
 github.com/gogo/protobuf/plugin/face
 github.com/gogo/protobuf/plugin/gostring
-github.com/gogo/protobuf/plugin/grpc
 github.com/gogo/protobuf/plugin/marshalto
 github.com/gogo/protobuf/plugin/oneofcheck
 github.com/gogo/protobuf/plugin/populate
@@ -26,7 +27,9 @@ github.com/gogo/protobuf/plugin/size
 github.com/gogo/protobuf/plugin/stringer
 github.com/gogo/protobuf/plugin/union
 github.com/gogo/protobuf/plugin/unmarshal
-# github.com/graphql-go/graphql v0.0.0-20160318075850-909ca9f800e7
+github.com/gogo/protobuf/protoc-gen-gogo/grpc
+github.com/gogo/protobuf/sortkeys
+# github.com/graphql-go/graphql v0.7.8
 github.com/graphql-go/graphql
 github.com/graphql-go/graphql/language/ast
 github.com/graphql-go/graphql/gqlerrors
@@ -37,9 +40,10 @@ github.com/graphql-go/graphql/language/source
 github.com/graphql-go/graphql/language/visitor
 github.com/graphql-go/graphql/language/location
 github.com/graphql-go/graphql/language/lexer
+github.com/graphql-go/graphql/language/typeInfo
 # github.com/pmezard/go-difflib v1.0.0
 github.com/pmezard/go-difflib/difflib
-# github.com/stretchr/testify v0.0.0-20160407130123-0744955171b0
+# github.com/stretchr/testify v1.4.0
 github.com/stretchr/testify/assert
-# golang.org/x/net v0.0.0-20160619234541-8bf2b39827db
-golang.org/x/net/context
+# gopkg.in/yaml.v2 v2.2.2
+gopkg.in/yaml.v2

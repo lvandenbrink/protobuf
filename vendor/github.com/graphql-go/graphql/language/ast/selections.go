@@ -5,6 +5,7 @@ import (
 )
 
 type Selection interface {
+	GetSelectionSet() *SelectionSet
 }
 
 // Ensure that all definition types implements Selection interface
@@ -27,15 +28,8 @@ func NewField(f *Field) *Field {
 	if f == nil {
 		f = &Field{}
 	}
-	return &Field{
-		Kind:         kinds.Field,
-		Loc:          f.Loc,
-		Alias:        f.Alias,
-		Name:         f.Name,
-		Arguments:    f.Arguments,
-		Directives:   f.Directives,
-		SelectionSet: f.SelectionSet,
-	}
+	f.Kind = kinds.Field
+	return f
 }
 
 func (f *Field) GetKind() string {
@@ -44,6 +38,10 @@ func (f *Field) GetKind() string {
 
 func (f *Field) GetLoc() *Location {
 	return f.Loc
+}
+
+func (f *Field) GetSelectionSet() *SelectionSet {
+	return f.SelectionSet
 }
 
 // FragmentSpread implements Node, Selection
@@ -72,6 +70,10 @@ func (fs *FragmentSpread) GetKind() string {
 
 func (fs *FragmentSpread) GetLoc() *Location {
 	return fs.Loc
+}
+
+func (fs *FragmentSpread) GetSelectionSet() *SelectionSet {
+	return nil
 }
 
 // InlineFragment implements Node, Selection
@@ -104,6 +106,10 @@ func (f *InlineFragment) GetLoc() *Location {
 	return f.Loc
 }
 
+func (f *InlineFragment) GetSelectionSet() *SelectionSet {
+	return f.SelectionSet
+}
+
 // SelectionSet implements Node
 type SelectionSet struct {
 	Kind       string
@@ -115,11 +121,8 @@ func NewSelectionSet(ss *SelectionSet) *SelectionSet {
 	if ss == nil {
 		ss = &SelectionSet{}
 	}
-	return &SelectionSet{
-		Kind:       kinds.SelectionSet,
-		Loc:        ss.Loc,
-		Selections: ss.Selections,
-	}
+	ss.Kind = kinds.SelectionSet
+	return ss
 }
 
 func (ss *SelectionSet) GetKind() string {
