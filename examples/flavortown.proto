@@ -26,7 +26,7 @@ message LineItem {
     flavortown.dessert.Dessert tasty_dessert = 101;
   }
   // The price of the dish in cents
-  int32 price_cents = 2;
+  uint32 price_cents = 2;
   // A timestamp representing when the dish was added to the menu
   opsee.types.Timestamp created_at = 3;
   // A timestamp representing when the dish was updated
