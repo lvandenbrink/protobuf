@@ -11,7 +11,7 @@ import (
 	"unicode"
 )
 
-const opseeTypes = "opsee_types"
+const opseeTypes = "opsee.types"
 
 type graphql struct {
 	*generator.Generator
@@ -115,7 +115,7 @@ func (p *graphql) Generate(file *generator.FileDescriptor) {
 
 		p.P(p.graphQLTypeVarName(message), ` = `, graphQLPkg.Use(), `.NewObject(`, graphQLPkg.Use(), `.ObjectConfig{`)
 		p.In()
-		p.P(`Name:        "`, p.TypeNameWithPackage(message), `",`)
+		p.P(`Name:        "`, p.TypeName(message), `",`)
 		p.P(`Description: `, messageGQL, `,`)
 		p.P(`Fields: (`, graphQLPkg.Use(), `.FieldsThunk)(func() `, graphQLPkg.Use(), `.Fields {`)
 		p.In()
@@ -231,19 +231,18 @@ func (p *graphql) Generate(file *generator.FileDescriptor) {
 		}
 		p.Out()
 		p.P(`},`)
-		p.P(`ResolveType: func (value interface{}, info `, graphQLPkg.Use(), `.ResolveInfo) *`, graphQLPkg.Use(), `.Object {`)
+		p.P(`ResolveType: func (p `, graphQLPkg.Use(), `.ResolveTypeParams) *`, graphQLPkg.Use(), `.Object {`)
 		p.In()
-		p.P(`switch value.(type) {`)
 		for _, field := range oo.fields {
 			obj := p.ObjectNamed(field.GetTypeName())
 			fname := generator.CamelCase(field.GetName())
 
-			p.P(`case *`, ccTypeName, `_`, fname, `:`)
+			p.P(`if _, ok := p.Value.(*`, ccTypeName, `_`, fname, `); ok {`)
 			p.In()
 			p.P(`return `, p.graphQLTypeVarName(obj))
 			p.Out()
+			p.P(`}`)
 		}
-		p.P(`}`)
 		p.P(`return nil`)
 		p.Out()
 		p.P(`},`)
@@ -278,7 +277,7 @@ func (p *graphql) graphQLType(message *generator.Descriptor, field *descriptor.F
 		// TODO: fix this to be more robust about imported objects
 		mobj := p.ObjectNamed(field.GetTypeName())
 		// fmt.Fprint(os.Stderr, mobj.PackageName())
-		if strings.HasPrefix(mobj.PackageName(), opseeTypes) {
+		if strings.EqualFold(mobj.File().GetPackage(), opseeTypes) {
 			gqltype = fmt.Sprint(schemaPkgName.Use(), ".", generator.CamelCaseSlice(mobj.TypeName()))
 			break
 		}
