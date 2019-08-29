@@ -10,6 +10,14 @@ package flavortown;
 
 option (opseeproto.graphql) = true;
 
+
+// quality of comment
+enum Quality {
+    EXPENSIVE = 0;
+    FAIR = 1;
+    CHEAP = 2;
+}
+
 // The menu at Guy’s American Kitchen & Bar reflects his signature style of authentic and surprising flavors
 message Menu {
   // These dishes are crafted with the heart and soul of hometown favorites and infused with Guy’s big, daring flavors
@@ -35,6 +43,8 @@ message LineItem {
   Nothing nothing = 5;
   // permission to eat?
   opsee.types.Permission sides = 6;
+  // quality of item
+  Quality qualityControl = 7;
 }
 
 // A delicious lunch dish on the menu

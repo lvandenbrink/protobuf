@@ -1,6 +1,8 @@
 package flavortown
 
 import (
+	"bytes"
+	"encoding/json"
 	"testing"
 
 	"github.com/graphql-go/graphql"
@@ -34,32 +36,35 @@ func TestSchema(t *testing.T) {
 						"tips":     "frosted",
 					},
 				}},
-				PriceCents: 100,
-				CreatedAt:  &opsee_types.Timestamp{100, 100},
-				UpdatedAt:  &opsee_types.Timestamp{200, 200},
-				Sides:      sa,
+				PriceCents:     100,
+				CreatedAt:      &opsee_types.Timestamp{100, 100},
+				UpdatedAt:      &opsee_types.Timestamp{200, 200},
+				Sides:          sa,
+				QualityControl: Quality_FAIR,
 			},
 			{
 				Dish: &LineItem_TastyDessert{&dessert.Dessert{
 					Name:      "coolwhip",
 					Sweetness: 9,
 				}},
-				PriceCents: 50,
-				CreatedAt:  &opsee_types.Timestamp{100, 100},
-				UpdatedAt:  &opsee_types.Timestamp{200, 200},
-				Sides:      sb,
-				Nothing:    nil,
+				PriceCents:     50,
+				CreatedAt:      &opsee_types.Timestamp{100, 100},
+				UpdatedAt:      &opsee_types.Timestamp{200, 200},
+				Sides:          sb,
+				Nothing:        nil,
+				QualityControl: Quality_EXPENSIVE,
 			},
 			{
 				Dish: &LineItem_TastyDessert{&dessert.Dessert{
 					Name:      "coolwhip",
 					Sweetness: 9,
 				}},
-				PriceCents: 50,
-				CreatedAt:  &opsee_types.Timestamp{100, 100},
-				UpdatedAt:  &opsee_types.Timestamp{200, 200},
-				Sides:      sc,
-				Nothing:    nil,
+				PriceCents:     50,
+				CreatedAt:      &opsee_types.Timestamp{100, 100},
+				UpdatedAt:      &opsee_types.Timestamp{200, 200},
+				Sides:          sc,
+				Nothing:        nil,
+				QualityControl: Quality_CHEAP,
 			},
 		},
 	}
@@ -103,6 +108,7 @@ func TestSchema(t *testing.T) {
 				nothing {
 					void
 				}
+				qualityControl
 			}
 		}
 	}`})
@@ -110,6 +116,8 @@ func TestSchema(t *testing.T) {
 	if queryResponse.HasErrors() {
 		t.Fatalf("graphql query errors: %#v\n", queryResponse.Errors)
 	}
+
+	t.Logf("repsonse: %s", formatResponse(queryResponse))
 
 	lunchitem := populatedMenu.Items[0]
 	assert.Equal(t, lunchitem.GetLunch().Name, getProp(queryResponse.Data, "menu", "items", 0, "dish", "name"))
@@ -119,6 +127,7 @@ func TestSchema(t *testing.T) {
 	assert.EqualValues(t, lunchitem.CreatedAt.Millis(), getProp(queryResponse.Data, "menu", "items", 0, "created_at"))
 	assert.EqualValues(t, lunchitem.UpdatedAt.Millis(), getProp(queryResponse.Data, "menu", "items", 0, "updated_at"))
 	assert.EqualValues(t, lunchitem.Sides.Permissions(), getProp(queryResponse.Data, "menu", "items", 0, "sides"))
+	assert.EqualValues(t, lunchitem.QualityControl.String(), getProp(queryResponse.Data, "menu", "items", 0, "qualityControl"))
 	t.Logf("%v", getProp(queryResponse.Data, "menu", "items", 0, "sides"))
 
 	dessertitem := populatedMenu.Items[1]
@@ -128,6 +137,7 @@ func TestSchema(t *testing.T) {
 	assert.EqualValues(t, dessertitem.CreatedAt.Millis(), getProp(queryResponse.Data, "menu", "items", 1, "created_at"))
 	assert.EqualValues(t, dessertitem.UpdatedAt.Millis(), getProp(queryResponse.Data, "menu", "items", 1, "updated_at"))
 	assert.EqualValues(t, dessertitem.Sides.Permissions(), getProp(queryResponse.Data, "menu", "items", 1, "sides"))
+	assert.EqualValues(t, dessertitem.QualityControl.String(), getProp(queryResponse.Data, "menu", "items", 1, "qualityControl"))
 
 	dessertitem = populatedMenu.Items[2]
 	assert.Equal(t, dessertitem.GetTastyDessert().Name, getProp(queryResponse.Data, "menu", "items", 2, "dish", "name"))
@@ -136,7 +146,22 @@ func TestSchema(t *testing.T) {
 	assert.EqualValues(t, dessertitem.CreatedAt.Millis(), getProp(queryResponse.Data, "menu", "items", 2, "created_at"))
 	assert.EqualValues(t, dessertitem.UpdatedAt.Millis(), getProp(queryResponse.Data, "menu", "items", 2, "updated_at"))
 	assert.EqualValues(t, dessertitem.Sides.Permissions(), getProp(queryResponse.Data, "menu", "items", 2, "sides"))
+	assert.EqualValues(t, dessertitem.QualityControl.String(), getProp(queryResponse.Data, "menu", "items", 2, "qualityControl"))
 
+}
+
+func formatResponse(v interface{}) string {
+	jsonObject, err := json.Marshal(v)
+	if err != nil {
+		return "failed to format"
+	}
+
+	var out bytes.Buffer
+	err = json.Indent(&out, []byte(jsonObject), "", "\t")
+	if err != nil {
+		return string(jsonObject)
+	}
+	return out.String()
 }
 
 func getProp(i interface{}, path ...interface{}) interface{} {

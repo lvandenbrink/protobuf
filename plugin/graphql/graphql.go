@@ -18,6 +18,7 @@ type graphql struct {
 	generator.PluginImports
 	messages []*generator.Descriptor
 	oneofs   map[*descriptor.OneofDescriptorProto]*oneof
+	enums    []*generator.EnumDescriptor
 }
 
 type oneof struct {
@@ -47,6 +48,7 @@ func (p *graphql) Generate(file *generator.FileDescriptor) {
 	p.PluginImports = generator.NewPluginImports(p.Generator)
 	p.messages = make([]*generator.Descriptor, 0)
 	p.oneofs = make(map[*descriptor.OneofDescriptorProto]*oneof)
+	p.enums = make([]*generator.EnumDescriptor, 0)
 
 	if opseeproto.GetGraphQLFile(file.FileDescriptorProto) != true {
 		return
@@ -55,6 +57,11 @@ func (p *graphql) Generate(file *generator.FileDescriptor) {
 	graphQLPkg := p.NewImport("github.com/graphql-go/graphql")
 	schemaPkg := p.NewImport("github.com/opsee/protobuf/plugin/graphql/scalars")
 	fmtPkg := p.NewImport("fmt")
+
+	for _, enum := range file.Enums() {
+		p.P(`var `, p.graphQLTypeEnumName(enum), ` *`, graphQLPkg.Use(), `.Enum`)
+		p.enums = append(p.enums, enum)
+	}
 
 	for mi, message := range file.Messages() {
 		if len(message.DescriptorProto.Field) == 0 {
@@ -109,6 +116,25 @@ func (p *graphql) Generate(file *generator.FileDescriptor) {
 	p.P(`func init() {`)
 	p.In()
 
+	// enum type declarations
+	for _, enum := range p.enums {
+		p.P(p.graphQLTypeEnumName(enum), ` = `, graphQLPkg.Use(), `.NewEnum(`, graphQLPkg.Use(), `.EnumConfig{`)
+		p.In()
+		p.P(`Name:        "`, p.TypeName(enum), `",`)
+		p.P(`Values: `, graphQLPkg.Use(), `.EnumValueConfigMap{`)
+		p.In()
+
+		for _, enumValue := range enum.GetValue() {
+			p.P(`"`, enumValue.GetName(), `": &`, graphQLPkg.Use(), `.EnumValueConfig{`)
+			p.P(`Value: `, int(enumValue.GetNumber()), `,`)
+			p.P(`},`)
+		}
+		p.Out()
+		p.P(`},`)
+		p.Out()
+		p.P(`})`)
+	}
+
 	for mi, message := range p.messages {
 		messageGQL := p.comment(fmt.Sprintf("4,%d", mi))
 		ccTypeName := generator.CamelCaseSlice(message.TypeName())
@@ -151,7 +177,11 @@ func (p *graphql) Generate(file *generator.FileDescriptor) {
 				p.P(`}`)
 				p.P(`return obj.Get`, p.GetFieldName(message, field), `(), nil`)
 			} else {
-				p.P(`return obj.`, p.GetFieldName(message, field), `, nil`)
+				if field.GetType() == descriptor.FieldDescriptorProto_TYPE_ENUM {
+					p.P(`return int(`, p.graphQLEnumLookupType(field), `_value[obj.`, p.GetFieldName(message, field), `.String()]), nil`)
+				} else {
+					p.P(`return obj.`, p.GetFieldName(message, field), `, nil`)
+				}
 			}
 
 			p.Out()
@@ -174,7 +204,11 @@ func (p *graphql) Generate(file *generator.FileDescriptor) {
 				p.P(`}`)
 				p.P(`return face.Get`, p.GetFieldName(message, field), `(), nil`)
 			} else {
-				p.P(`return face.`, p.GetFieldName(message, field), `, nil`)
+				if field.GetType() == descriptor.FieldDescriptorProto_TYPE_ENUM {
+					p.P(`return int(`, p.graphQLEnumLookupType(field), `_value[face.`, p.GetFieldName(message, field), `.String()]), nil`)
+				} else {
+					p.P(`return face.`, p.GetFieldName(message, field), `, nil`)
+				}
 			}
 
 			p.Out()
@@ -272,7 +306,8 @@ func (p *graphql) graphQLType(message *generator.Descriptor, field *descriptor.F
 	case descriptor.FieldDescriptorProto_TYPE_GROUP:
 		panic("mapping a proto group type to graphql is unimplemented")
 	case descriptor.FieldDescriptorProto_TYPE_ENUM:
-		panic("mapping a proto enum type to graphql is unimplemented")
+		mobj := p.ObjectNamed(field.GetTypeName())
+		gqltype = p.graphQLTypeEnumName(mobj)
 	case descriptor.FieldDescriptorProto_TYPE_MESSAGE:
 		// TODO: fix this to be more robust about imported objects
 		mobj := p.ObjectNamed(field.GetTypeName())
@@ -306,6 +341,14 @@ func (p *graphql) comment(path string) string {
 
 func (p *graphql) graphQLTypeVarName(obj generator.Object) string {
 	return fmt.Sprint(p.DefaultPackageName(obj), "GraphQL", generator.CamelCaseSlice(obj.TypeName()), "Type")
+}
+
+func (p *graphql) graphQLTypeEnumName(obj generator.Object) string {
+	return fmt.Sprint(p.DefaultPackageName(obj), "GraphQL", generator.CamelCaseSlice(obj.TypeName()), "Enum")
+}
+
+func (p *graphql) graphQLEnumLookupType(field *descriptor.FieldDescriptorProto) string {
+	return generator.CamelCaseSlice(p.ObjectNamed(field.GetTypeName()).TypeName())
 }
 
 func graphQLUnionName(message *generator.Descriptor, oneof *descriptor.OneofDescriptorProto) string {
