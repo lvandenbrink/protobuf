@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package testdata;
+
+import "github.com/opsee/protobuf/opseeproto/opsee.proto";
+
+option (opseeproto.graphql) = true;
+
+// A delicious dessert dish on the menu
+message Dessert {
+  // The name of the dish
+  string name = 1;
+  // How sweet is the dish, an integer between 0 and 10
+  int32 sweetness = 2;
+}

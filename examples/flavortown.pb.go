@@ -6,15 +6,16 @@ package flavortown
 import (
 	bytes "bytes"
 	fmt "fmt"
+	github_com_bi_foundation_protobuf_graphql_extension_plugin_graphql_scalars "github.com/bi-foundation/protobuf-graphql-extension/plugin/graphql/scalars"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	github_com_graphql_go_graphql "github.com/graphql-go/graphql"
 	dessert "github.com/opsee/protobuf/examples/dessert"
 	_ "github.com/opsee/protobuf/opseeproto"
 	types "github.com/opsee/protobuf/opseeproto/types"
-	github_com_opsee_protobuf_plugin_graphql_scalars "github.com/opsee/protobuf/plugin/graphql/scalars"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -26,7 +27,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // quality of comment
 type Quality int32
@@ -80,7 +81,7 @@ func (m *Menu) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Menu.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -145,7 +146,7 @@ func (m *LineItem) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_LineItem.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -244,78 +245,12 @@ func (m *LineItem) GetQualityControl() Quality {
 	return Quality_EXPENSIVE
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*LineItem) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _LineItem_OneofMarshaler, _LineItem_OneofUnmarshaler, _LineItem_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*LineItem) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*LineItem_Lunch)(nil),
 		(*LineItem_TastyDessert)(nil),
 	}
-}
-
-func _LineItem_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*LineItem)
-	// dish
-	switch x := m.Dish.(type) {
-	case *LineItem_Lunch:
-		_ = b.EncodeVarint(100<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Lunch); err != nil {
-			return err
-		}
-	case *LineItem_TastyDessert:
-		_ = b.EncodeVarint(101<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.TastyDessert); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("LineItem.Dish has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _LineItem_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*LineItem)
-	switch tag {
-	case 100: // dish.lunch
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(Lunch)
-		err := b.DecodeMessage(msg)
-		m.Dish = &LineItem_Lunch{msg}
-		return true, err
-	case 101: // dish.tasty_dessert
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(dessert.Dessert)
-		err := b.DecodeMessage(msg)
-		m.Dish = &LineItem_TastyDessert{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _LineItem_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*LineItem)
-	// dish
-	switch x := m.Dish.(type) {
-	case *LineItem_Lunch:
-		s := proto.Size(x.Lunch)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *LineItem_TastyDessert:
-		s := proto.Size(x.TastyDessert)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // A delicious lunch dish on the menu
@@ -345,7 +280,7 @@ func (m *Lunch) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Lunch.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -408,7 +343,7 @@ func (m *Nothing) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Nothing.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -703,7 +638,7 @@ type LunchGetter interface {
 }
 
 var GraphQLLunchType *github_com_graphql_go_graphql.Object
-var GraphQLLunch_TagsEntryType = github_com_opsee_protobuf_plugin_graphql_scalars.Map
+var GraphQLLunch_TagsEntryType = github_com_bi_foundation_protobuf_graphql_extension_plugin_graphql_scalars.Map
 
 type NothingGetter interface {
 	GetNothing() *Nothing
@@ -785,7 +720,7 @@ func init() {
 					},
 				},
 				"created_at": &github_com_graphql_go_graphql.Field{
-					Type:        github_com_opsee_protobuf_plugin_graphql_scalars.Timestamp,
+					Type:        types.GraphQLTimestampType,
 					Description: "A timestamp representing when the dish was added to the menu",
 					Resolve: func(p github_com_graphql_go_graphql.ResolveParams) (interface{}, error) {
 						obj, ok := p.Source.(*LineItem)
@@ -810,7 +745,7 @@ func init() {
 					},
 				},
 				"updated_at": &github_com_graphql_go_graphql.Field{
-					Type:        github_com_opsee_protobuf_plugin_graphql_scalars.Timestamp,
+					Type:        types.GraphQLTimestampType,
 					Description: "A timestamp representing when the dish was updated",
 					Resolve: func(p github_com_graphql_go_graphql.ResolveParams) (interface{}, error) {
 						obj, ok := p.Source.(*LineItem)
@@ -860,7 +795,7 @@ func init() {
 					},
 				},
 				"sides": &github_com_graphql_go_graphql.Field{
-					Type:        github_com_opsee_protobuf_plugin_graphql_scalars.Permission,
+					Type:        types.GraphQLPermissionType,
 					Description: "permission to eat?",
 					Resolve: func(p github_com_graphql_go_graphql.ResolveParams) (interface{}, error) {
 						obj, ok := p.Source.(*LineItem)
@@ -908,10 +843,18 @@ func init() {
 					Description: "The menu dish, can either be lunch or dessert",
 					Resolve: func(p github_com_graphql_go_graphql.ResolveParams) (interface{}, error) {
 						obj, ok := p.Source.(*LineItem)
-						if !ok {
-							return nil, fmt.Errorf("field dish not resolved")
+						if ok {
+							return obj.GetDish(), nil
 						}
-						return obj.GetDish(), nil
+						inter, ok := p.Source.(LineItemGetter)
+						if ok {
+							face := inter.GetLineItem()
+							if face == nil {
+								return nil, nil
+							}
+							return face.GetDish(), nil
+						}
+						return nil, fmt.Errorf("field dish not resolved")
 					},
 				},
 			}
@@ -942,7 +885,7 @@ func init() {
 					},
 				},
 				"description": &github_com_graphql_go_graphql.Field{
-					Type:        github_com_opsee_protobuf_plugin_graphql_scalars.ByteString,
+					Type:        github_com_bi_foundation_protobuf_graphql_extension_plugin_graphql_scalars.ByteString,
 					Description: "The description of the dish",
 					Resolve: func(p github_com_graphql_go_graphql.ResolveParams) (interface{}, error) {
 						obj, ok := p.Source.(*Lunch)
@@ -1030,7 +973,7 @@ func init() {
 func (m *Menu) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1038,32 +981,40 @@ func (m *Menu) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Menu) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Menu) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
 	if len(m.Items) > 0 {
-		for _, msg := range m.Items {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintFlavortown(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Items) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Items[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintFlavortown(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *LineItem) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1071,109 +1022,137 @@ func (m *LineItem) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *LineItem) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *LineItem) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.PriceCents != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintFlavortown(dAtA, i, uint64(m.PriceCents))
-	}
-	if m.CreatedAt != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintFlavortown(dAtA, i, uint64(m.CreatedAt.Size()))
-		n1, err := m.CreatedAt.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n1
-	}
-	if m.UpdatedAt != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintFlavortown(dAtA, i, uint64(m.UpdatedAt.Size()))
-		n2, err := m.UpdatedAt.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n2
-	}
-	if m.Nothing != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintFlavortown(dAtA, i, uint64(m.Nothing.Size()))
-		n3, err := m.Nothing.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n3
-	}
-	if m.Sides != nil {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintFlavortown(dAtA, i, uint64(m.Sides.Size()))
-		n4, err := m.Sides.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n4
-	}
-	if m.QualityControl != 0 {
-		dAtA[i] = 0x38
-		i++
-		i = encodeVarintFlavortown(dAtA, i, uint64(m.QualityControl))
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if m.Dish != nil {
-		nn5, err := m.Dish.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size := m.Dish.Size()
+			i -= size
+			if _, err := m.Dish.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
 		}
-		i += nn5
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if m.QualityControl != 0 {
+		i = encodeVarintFlavortown(dAtA, i, uint64(m.QualityControl))
+		i--
+		dAtA[i] = 0x38
 	}
-	return i, nil
+	if m.Sides != nil {
+		{
+			size, err := m.Sides.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintFlavortown(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x32
+	}
+	if m.Nothing != nil {
+		{
+			size, err := m.Nothing.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintFlavortown(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.UpdatedAt != nil {
+		{
+			size, err := m.UpdatedAt.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintFlavortown(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.CreatedAt != nil {
+		{
+			size, err := m.CreatedAt.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintFlavortown(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.PriceCents != 0 {
+		i = encodeVarintFlavortown(dAtA, i, uint64(m.PriceCents))
+		i--
+		dAtA[i] = 0x10
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *LineItem_Lunch) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *LineItem_Lunch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.Lunch != nil {
-		dAtA[i] = 0xa2
-		i++
-		dAtA[i] = 0x6
-		i++
-		i = encodeVarintFlavortown(dAtA, i, uint64(m.Lunch.Size()))
-		n6, err := m.Lunch.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.Lunch.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintFlavortown(dAtA, i, uint64(size))
 		}
-		i += n6
+		i--
+		dAtA[i] = 0x6
+		i--
+		dAtA[i] = 0xa2
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *LineItem_TastyDessert) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *LineItem_TastyDessert) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.TastyDessert != nil {
-		dAtA[i] = 0xaa
-		i++
-		dAtA[i] = 0x6
-		i++
-		i = encodeVarintFlavortown(dAtA, i, uint64(m.TastyDessert.Size()))
-		n7, err := m.TastyDessert.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.TastyDessert.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintFlavortown(dAtA, i, uint64(size))
 		}
-		i += n7
+		i--
+		dAtA[i] = 0x6
+		i--
+		dAtA[i] = 0xaa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *Lunch) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1181,49 +1160,59 @@ func (m *Lunch) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Lunch) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Lunch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Name) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintFlavortown(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
-	if len(m.Description) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintFlavortown(dAtA, i, uint64(len(m.Description)))
-		i += copy(dAtA[i:], m.Description)
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if len(m.Tags) > 0 {
-		for k, _ := range m.Tags {
-			dAtA[i] = 0x1a
-			i++
+		for k := range m.Tags {
 			v := m.Tags[k]
-			mapSize := 1 + len(k) + sovFlavortown(uint64(len(k))) + 1 + len(v) + sovFlavortown(uint64(len(v)))
-			i = encodeVarintFlavortown(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintFlavortown(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
 			i = encodeVarintFlavortown(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintFlavortown(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintFlavortown(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x1a
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintFlavortown(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintFlavortown(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *Nothing) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1231,34 +1220,43 @@ func (m *Nothing) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Nothing) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Nothing) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Void) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintFlavortown(dAtA, i, uint64(len(m.Void)))
-		i += copy(dAtA[i:], m.Void)
-	}
 	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	return i, nil
+	if len(m.Void) > 0 {
+		i -= len(m.Void)
+		copy(dAtA[i:], m.Void)
+		i = encodeVarintFlavortown(dAtA, i, uint64(len(m.Void)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintFlavortown(dAtA []byte, offset int, v uint64) int {
+	offset -= sovFlavortown(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedMenu(r randyFlavortown, easy bool) *Menu {
 	this := &Menu{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v1 := r.Intn(5)
 		this.Items = make([]*LineItem, v1)
 		for i := 0; i < v1; i++ {
@@ -1274,16 +1272,16 @@ func NewPopulatedMenu(r randyFlavortown, easy bool) *Menu {
 func NewPopulatedLineItem(r randyFlavortown, easy bool) *LineItem {
 	this := &LineItem{}
 	this.PriceCents = uint32(r.Uint32())
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.CreatedAt = types.NewPopulatedTimestamp(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.UpdatedAt = types.NewPopulatedTimestamp(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.Nothing = NewPopulatedNothing(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.Sides = types.NewPopulatedPermission(r, easy)
 	}
 	this.QualityControl = Quality([]int32{0, 1, 2}[r.Intn(3)])
@@ -1318,7 +1316,7 @@ func NewPopulatedLunch(r randyFlavortown, easy bool) *Lunch {
 	for i := 0; i < v2; i++ {
 		this.Description[i] = byte(r.Intn(256))
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v3 := r.Intn(10)
 		this.Tags = make(map[string]string)
 		for i := 0; i < v3; i++ {
@@ -1536,14 +1534,7 @@ func (m *Nothing) Size() (n int) {
 }
 
 func sovFlavortown(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozFlavortown(x uint64) (n int) {
 	return sovFlavortown(uint64((x << 1) ^ uint64((int64(x) >> 63))))

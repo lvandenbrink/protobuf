@@ -123,6 +123,15 @@ func TestUserProtoCompactText(t *testing.T) {
 	}
 }
 
+func TestUserGraphQL(t *testing.T) {
+	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	_ = NewPopulatedUser(popr, false)
+	objdesc := ""
+	pdesc := GraphQLUserType.PrivateDescription
+	if pdesc != objdesc {
+		t.Fatalf("String want %v got %v", objdesc, pdesc)
+	}
+}
 func TestUserSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
@@ -142,16 +151,6 @@ func TestUserSize(t *testing.T) {
 	size3 := github_com_gogo_protobuf_proto.Size(p)
 	if size3 != size {
 		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
-	}
-}
-
-func TestUserGraphQL(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
-	_ = NewPopulatedUser(popr, false)
-	objdesc := ""
-	pdesc := GraphQLUserType.PrivateDescription
-	if pdesc != objdesc {
-		t.Fatalf("String want %v got %v", objdesc, pdesc)
 	}
 }
 

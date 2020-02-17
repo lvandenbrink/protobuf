@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package testdata;
+
+import "github.com/opsee/protobuf/opseeproto/opsee.proto";
+import "github.com/opsee/protobuf/opseeproto/types/timestamp.proto";
+
+option (opseeproto.graphql) = true;
+
+message Timed {
+  opsee.types.Timestamp updated_at = 1 ;
+}

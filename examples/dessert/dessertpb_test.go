@@ -123,6 +123,15 @@ func TestDessertProtoCompactText(t *testing.T) {
 	}
 }
 
+func TestDessertGraphQL(t *testing.T) {
+	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	_ = NewPopulatedDessert(popr, false)
+	objdesc := "A delicious dessert dish on the menu"
+	pdesc := GraphQLDessertType.PrivateDescription
+	if pdesc != objdesc {
+		t.Fatalf("String want %v got %v", objdesc, pdesc)
+	}
+}
 func TestDessertSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
@@ -142,16 +151,6 @@ func TestDessertSize(t *testing.T) {
 	size3 := github_com_gogo_protobuf_proto.Size(p)
 	if size3 != size {
 		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
-	}
-}
-
-func TestDessertGraphQL(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
-	_ = NewPopulatedDessert(popr, false)
-	objdesc := "A delicious dessert dish on the menu"
-	pdesc := GraphQLDessertType.PrivateDescription
-	if pdesc != objdesc {
-		t.Fatalf("String want %v got %v", objdesc, pdesc)
 	}
 }
 

@@ -431,6 +431,42 @@ func TestNothingProtoCompactText(t *testing.T) {
 	}
 }
 
+func TestMenuGraphQL(t *testing.T) {
+	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	_ = NewPopulatedMenu(popr, false)
+	objdesc := "The menu at Guy’s American Kitchen & Bar reflects his signature style of authentic and surprising flavors"
+	pdesc := GraphQLMenuType.PrivateDescription
+	if pdesc != objdesc {
+		t.Fatalf("String want %v got %v", objdesc, pdesc)
+	}
+}
+func TestLineItemGraphQL(t *testing.T) {
+	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	_ = NewPopulatedLineItem(popr, false)
+	objdesc := "A line item representing a dish and price"
+	pdesc := GraphQLLineItemType.PrivateDescription
+	if pdesc != objdesc {
+		t.Fatalf("String want %v got %v", objdesc, pdesc)
+	}
+}
+func TestLunchGraphQL(t *testing.T) {
+	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	_ = NewPopulatedLunch(popr, false)
+	objdesc := "A delicious lunch dish on the menu"
+	pdesc := GraphQLLunchType.PrivateDescription
+	if pdesc != objdesc {
+		t.Fatalf("String want %v got %v", objdesc, pdesc)
+	}
+}
+func TestNothingGraphQL(t *testing.T) {
+	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	_ = NewPopulatedNothing(popr, false)
+	objdesc := "confusion"
+	pdesc := GraphQLNothingType.PrivateDescription
+	if pdesc != objdesc {
+		t.Fatalf("String want %v got %v", objdesc, pdesc)
+	}
+}
 func TestMenuSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
@@ -516,43 +552,6 @@ func TestNothingSize(t *testing.T) {
 	size3 := github_com_gogo_protobuf_proto.Size(p)
 	if size3 != size {
 		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
-	}
-}
-
-func TestMenuGraphQL(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
-	_ = NewPopulatedMenu(popr, false)
-	objdesc := "The menu at Guy’s American Kitchen & Bar reflects his signature style of authentic and surprising flavors"
-	pdesc := GraphQLMenuType.PrivateDescription
-	if pdesc != objdesc {
-		t.Fatalf("String want %v got %v", objdesc, pdesc)
-	}
-}
-func TestLineItemGraphQL(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
-	_ = NewPopulatedLineItem(popr, false)
-	objdesc := "A line item representing a dish and price"
-	pdesc := GraphQLLineItemType.PrivateDescription
-	if pdesc != objdesc {
-		t.Fatalf("String want %v got %v", objdesc, pdesc)
-	}
-}
-func TestLunchGraphQL(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
-	_ = NewPopulatedLunch(popr, false)
-	objdesc := "A delicious lunch dish on the menu"
-	pdesc := GraphQLLunchType.PrivateDescription
-	if pdesc != objdesc {
-		t.Fatalf("String want %v got %v", objdesc, pdesc)
-	}
-}
-func TestNothingGraphQL(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
-	_ = NewPopulatedNothing(popr, false)
-	objdesc := "confusion"
-	pdesc := GraphQLNothingType.PrivateDescription
-	if pdesc != objdesc {
-		t.Fatalf("String want %v got %v", objdesc, pdesc)
 	}
 }
 

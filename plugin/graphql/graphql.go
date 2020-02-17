@@ -163,6 +163,20 @@ func (p *graphql) Generate(file *generator.FileDescriptor) {
 			p.In()
 			p.P(`Type:        `, p.graphQLType(message, field, graphQLPkg, schemaPkg), `,`)
 			p.P(`Description: `, fieldGQL, `,`)
+
+			// filter on arguments
+			if !hasStar { //&& field.GetType() == descriptor.FieldDescriptorProto_TYPE_ENUM {
+				p.P(`Arg:  map[string]*`, graphQLPkg.Use(), `.ArgumentConfig {`)
+				p.In()
+				p.P(`"`, p.GetFieldName(message, field), `": {`)
+				p.In()
+				p.P(`Type: `, graphQLPkg.Use(), `.String,`)
+				p.Out()
+				p.P(`},`)
+				p.Out()
+				p.P(`},`)
+			}
+
 			p.P(`Resolve: func(p `, graphQLPkg.Use(), `.ResolveParams) (interface{}, error) {`)
 			p.In()
 			p.P(`obj, ok := p.Source.(*`, ccTypeName, `)`)
@@ -175,12 +189,36 @@ func (p *graphql) Generate(file *generator.FileDescriptor) {
 				p.P(`return nil, nil`)
 				p.Out()
 				p.P(`}`)
-				p.P(`return obj.Get`, p.GetFieldName(message, field), `(), nil`)
+				p.P(`result := obj.Get`, p.GetFieldName(message, field), `()`)
+
+				p.P(`filter, ok := p.Args["`, p.GetFieldName(message, field), `"].(string)`)
+				p.P(`if ok && !result.`, p.GetFieldName(message, field), `.Equal(filter) {`)
+				p.In()
+				p.P(`return nil, nil`)
+				p.Out()
+				p.P(`}`)
+
+				p.P(`return result, nil`)
 			} else {
 				if field.GetType() == descriptor.FieldDescriptorProto_TYPE_ENUM {
-					p.P(`return int(`, p.graphQLEnumLookupType(field), `_value[obj.`, p.GetFieldName(message, field), `.String()]), nil`)
+					p.P(`result := int(`, p.graphQLEnumLookupType(field), `_value[obj.`, p.GetFieldName(message, field), `.String()])`)
+					p.P(`if `, p.GetFieldName(message, field), `ok := p.Args["`, p.GetFieldName(message, field), `"].(string); ok && result != `, p.GetFieldName(message, field), `.String() {`)
+					p.In()
+					p.P(`return nil, nil`)
+					p.Out()
+					p.P(`}`)
+					p.P(`return result, nil`)
 				} else {
-					p.P(`return obj.`, p.GetFieldName(message, field), `, nil`)
+					p.P(`result := obj.`, p.GetFieldName(message, field), ``)
+
+					p.P(`filter, ok := p.Args["`, p.GetFieldName(message, field), `"].(string)`)
+					p.P(`if ok && !result.`, p.GetFieldName(message, field), `.Equal(filter) {`)
+					p.In()
+					p.P(`return nil, nil`)
+					p.Out()
+					p.P(`}`)
+
+					p.P(`return result, nil`)
 				}
 			}
 
